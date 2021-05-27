@@ -8,8 +8,33 @@
 </head>
 <body>
     <h1>WASM Demo</h1>
-    <script src="demo.js"></script>
-<script>
+    <div id="container"></div>
+    <script type="text/javascript" src="demo.js"></script>
+<script type="text/javascript">
+ if ("WebAssembly" in window) {
+     
+     // создаем блок памяти
+     var memObj = new WebAssembly.Memory({initial: 256, maximum: 256});
+     var importObject = { env: { memory: memObj} };
+     var num_vals = 8;   // количество элементов в массиве
+     WebAssembly.instantiateStreaming(fetch("demo.wasm"), importObject)
+             .then(result => {
+                 console.log("resssssssult",result);
+                 // Получаем адрес массива из wasm
+                 offset = result.instance.exports._getOffset();
+                 // создаем массив
+                 var numbers = new Uint32Array(memObj.buffer, offset, num_vals);
+                 // инициализируем массив
+                 for(let i = 0; i < num_vals; i++){
+                     numbers[i] = i+1;
+                 }
+                 // вычисляем сумму элементов массива
+                 let sum = result.instance.exports._sum();
+                 document.getElementById("container").innerHTML = "Sum: " + sum;
+             })
+             .catch(console.error);
+     }
+ </script>    
 </script>
 </body>
 </html>

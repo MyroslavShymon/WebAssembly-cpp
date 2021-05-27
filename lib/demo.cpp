@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#define NUM_VALS 8
 using namespace std;
 
 extern "C" {
@@ -7,6 +8,25 @@ extern "C" {
     int* bubbleSort2(int arr[], int n);
     float sum_up(float vals[], int size);
     int sumArrayInt32 (int *array, int length);
+    int sum();
+    int* getOffset();
+}
+
+ 
+int numbers[NUM_VALS];
+ 
+int sum()
+{
+    int result = 0;
+   
+    for(int i=0; i < NUM_VALS; i++) {
+        result += numbers[i];
+    }
+    return result;
+}
+ 
+int* getOffset() {
+  return &numbers[0]; 
 }
 
 void swap(int *xp, int *yp)
