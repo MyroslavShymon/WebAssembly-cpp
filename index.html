@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASM Demo</title>
+</head>
+<body>
+    <h1>WASM Demo</h1>
+    <div id="container"></div>
+    <script type="text/javascript" src="demo.js"></script>
+    <script>
+        let addOne = cwrap("addOne", null, ["number", "number", "number"]);
+        
+        function pressBtn(){
+            let input_array = new Int32Array([10, 5, -3, 120, -70]); 
+            let len = input_array.length;					         
+            let bytes_per_element = input_array.BYTES_PER_ELEMENT;   
+            
+            
+            let input_ptr = _malloc(len * bytes_per_element);
+            let output_ptr = _malloc(len * bytes_per_element);
+            
+            HEAP32.set(input_array, input_ptr / bytes_per_element); 
+            addOne(input_ptr, output_ptr, len);   	                       
+            let output_array = new Int32Array(HEAP32.buffer, output_ptr, len); 
+            console.log("The starting array was:", input_array);
+            console.log("The result read is:	", output_array);
+            
+            
+            _free(input_ptr);
+            _free(output_ptr);
+        }
+        </script>
+        
+        <button onclick="pressBtn()">Click me!</button>
+        <p>Open the console to see the result!</p>
+</body>
+</html>
