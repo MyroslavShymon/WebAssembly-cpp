@@ -7,77 +7,88 @@
 
 using namespace std;
 
+string JSON = "";
+
 extern "C" {
-    int getNUM(int num);
-	  void addOne(int* input_ptr, int* output_ptr, int len);
-    void fstr(string path);
+  void addOne(int* input_ptr, int* output_ptr, int len);
 }
 
-// int* Func(int* Array, int size)
-// {
-//     cout<<"Array"<<Array<<"\n";
-//     int *new_array = new int[size];
-//     for(int i = 0; i < size; i++) {
-//         cout<<"Array[i] = "<<Array[i]<<"\t"<< i <<"\t" << size <<"\n";
-//         new_array[i] = Array[i] + 1;
-//     }
-//     return new_array;
-// }
-
-// int addTwoInts (int a, int b) {
-//     return a + b;
-// }
-
-
+void swap(int *xp, int *yp)
+{
+    int temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+ 
+// A function to implement bubble sort
+void bubbleSort(int arr[], int n)
+{
+    int i, j;
+    for (i = 0; i < n-1; i++)    
+     
+    // Last i elements are already in place
+    for (j = 0; j < n-i-1; j++)
+        if (arr[j] > arr[j+1])
+            swap(&arr[j], &arr[j+1]);
+}
+ 
+/* Function to print an array */
+void printArray(int arr[], int size)
+{
+    int i;
+    for (i = 0; i < size; i++)
+        cout << arr[i] << " ";
+    cout << endl;
+}
 class Person
 {
 private:
-	string _name;
-	int _age;
+  string _name;
+  int _age;
 public:
-	Person(string name, int age) {
-		_name = name;
-		_age = age;
-	}
-	// Getter
-	string name() {
-		return _name;
-	}
-	int age() {
-		return _age;
-	}
+  Person(string name, int age) {
+    _name = name;
+    _age = age;
+  }
+  // Getter
+  string name() {
+    return _name;
+  }
+  int age() {
+    return _age;
+  }
 };
 
 void addOne(int* input_ptr, int* output_ptr, int len) {
-	ofstream personsStream;
-	personsStream.open("pretty.txt");
-	if (!personsStream.is_open())
-	{
-		cout << "Not open\n";
-	}
-	else {
-		Person** persons = new Person * [len];
-    personsStream << "[" << "\n";
-    for (int i = 0; i < len; i++)
+	JSON="[";
+    bubbleSort(input_ptr, len);
+    for (int i = 0; i < len; i++) {
+      output_ptr[i] = input_ptr[i];
+    }
+  Person** persons = new Person * [len];
+  for (int i = 0; i < len; i++)
     {
       string s = "name" + to_string(input_ptr[i]);
       persons[i] = new Person(s, i);
+    
+    string name = persons[i]->name();
+    string age = to_string(persons[i]->age());
+    JSON.append("{'name':'");
+    JSON.append(name);
+    JSON.append("','age':'");
+    JSON.append(age);
+    JSON.append("'},");
     }
-
-    for (int i = 0; i < len; i++)
-    {
-      cout << "persons[" << i << "] name = " << persons[i]->name() << " age = " << persons[i]->age() << "\n";
-      personsStream << "{ name:'" << persons[i]->name() << "'; age: '" << persons[i]->age() << "';" << "\n";
-    }
-    personsStream.close();
-
-    for (int i = 0; i < len; i++) {
-      output_ptr[i] = input_ptr[i] + 1;
-    }
-	}
+	JSON.append("]");
+    int n = JSON.length();
+    char char_array[n + 1];
+    strcpy(char_array, JSON.c_str());
+	EM_ASM_({
+		JSON_str = UTF8ToString($0);
+		console.log('JSON ' + JSON_str);
+	}, char_array);
 }
 
-int main() {
-
-    return 0;
-}
+ int main() {
+   return 0;
+ }

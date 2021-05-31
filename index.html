@@ -12,6 +12,7 @@
     <script type="text/javascript" src="demo.js"></script>
     <script>
       let addOne = cwrap("addOne", "string", ["number", "number", "number"]);
+      let JSON_str, newJSON;
       function pressBtn() {
         let input_array = new Int32Array([10, 5, -3, 120, -70]);
         let len = input_array.length;
@@ -29,12 +30,14 @@
         _free(input_ptr);
         _free(output_ptr);
       }
+
+      function JSONShow() {
+        let parsedJson = JSON.parse(JSON.stringify(JSON_str));
+        console.log("stringify JSON", JSON.stringify(parsedJson));
+      }
     </script>
 
     <button onclick="pressBtn()">Click me!</button>
-    <button onclick="add({ operand1: 100, operand2: 1000 })">
-      Click me 2!
-    </button>
-    <p>Open the console to see the result!</p>
+    <button onclick="JSONShow()">Show JSON!</button>
   </body>
 </html>
