@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include<iostream>
-#include<fstream>
-#include<string>
-#include<emscripten.h>
+#include <iostream>
+#include <string>
+#include <emscripten.h>
+#include <chrono>
 // #include "Demo/Demo/Source.cpp"
 
 using namespace std;
@@ -11,6 +11,7 @@ string JSON = "";
 
 extern "C" {
   void addOne(int* input_ptr, int* output_ptr, int len);
+  int add(int a);
 }
 
 void swap(int *xp, int *yp)
@@ -19,7 +20,12 @@ void swap(int *xp, int *yp)
     *xp = *yp;
     *yp = temp;
 }
- 
+ EM_JS(void, setTime,
+     (double time), {
+		console.log("time bubble sort = ", time);
+   		time_bubble = time;
+ });
+
 // A function to implement bubble sort
 void bubbleSort(int arr[], int n)
 {
@@ -59,25 +65,45 @@ public:
   }
 };
 
+
+EM_JS(char*, returnName, (int i), {
+	let super_arr =	["safsd1","zdfsdf2","sdfsd3","dfgdf4","dfg5","dfgghfnhd6","dfbhdgj7"];
+	const greetings = super_arr[i];
+	const byteCount = (lengthBytesUTF8(greetings) + 1);
+	
+	const greetingsPointer = _malloc(byteCount);
+		stringToUTF8(greetings, greetingsPointer, byteCount);
+	
+		return greetingsPointer;
+});
+
 void addOne(int* input_ptr, int* output_ptr, int len) {
+	auto start = chrono::high_resolution_clock::now();
+    const char** arr;
+    arr = new const char*[len];    
+    for(int i = 0; i < len; i++) 
+        arr[i] = returnName(i);
+ 
+
 	JSON="[";
     bubbleSort(input_ptr, len);
+
     for (int i = 0; i < len; i++) {
       output_ptr[i] = input_ptr[i];
     }
-  Person** persons = new Person * [len];
-  for (int i = 0; i < len; i++)
+	Person** persons = new Person * [len];
+	for (int i = 0; i < len; i++)
     {
-      string s = "name" + to_string(input_ptr[i]);
-      persons[i] = new Person(s, i);
-    
-    string name = persons[i]->name();
-    string age = to_string(persons[i]->age());
-    JSON.append("{'name':'");
-    JSON.append(name);
-    JSON.append("','age':'");
-    JSON.append(age);
-    JSON.append("'},");
+		//   string s = "name" + to_string(input_ptr[i]);
+		persons[i] = new Person(arr[i], input_ptr[i]);
+		
+		string name = persons[i]->name();
+		string age = to_string(persons[i]->age());
+		JSON.append("{'name':'");
+		JSON.append(name);
+		JSON.append("','age':'");
+		JSON.append(age);
+		JSON.append("'},");
     }
 	JSON.append("]");
     int n = JSON.length();
@@ -87,6 +113,20 @@ void addOne(int* input_ptr, int* output_ptr, int len) {
 		JSON_str = UTF8ToString($0);
 		console.log('JSON ' + JSON_str);
 	}, char_array);
+	
+    delete []arr;	
+	auto end = chrono::high_resolution_clock::now();
+  
+    // Calculating total time taken by the program.
+    double time_taken = 
+      chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+  
+    time_taken *= 1e-9;
+	setTime(time_taken);
+}
+
+int add(int a){
+	return a + 1;
 }
 
  int main() {

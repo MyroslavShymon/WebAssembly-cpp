@@ -12,7 +12,25 @@
     <script type="text/javascript" src="demo.js"></script>
     <script>
       let addOne = cwrap("addOne", "string", ["number", "number", "number"]);
-      let JSON_str, newJSON;
+      let JSON_str,
+        newJSON,
+        time_bubble = 1;
+      let bubbleSort = (inputArr) => {
+        let len = inputArr.length;
+        let swapped;
+        do {
+          swapped = false;
+          for (let i = 0; i < len; i++) {
+            if (inputArr[i] > inputArr[i + 1]) {
+              let tmp = inputArr[i];
+              inputArr[i] = inputArr[i + 1];
+              inputArr[i + 1] = tmp;
+              swapped = true;
+            }
+          }
+        } while (swapped);
+        return inputArr;
+      };
       function pressBtn() {
         let input_array = new Int32Array([10, 5, -3, 120, -70]);
         let len = input_array.length;
@@ -22,7 +40,17 @@
         let output_ptr = _malloc(len * bytes_per_element);
 
         HEAP32.set(input_array, input_ptr / bytes_per_element);
+
+        let time = performance.now();
         addOne(input_ptr, output_ptr, len);
+        time = performance.now() - time;
+        console.log("Время выполнения = ", time);
+
+        let time2 = performance.now();
+        let ddd = bubbleSort([10, 5, -3, 120, -70]);
+        time2 = performance.now() - time2;
+        console.log("Время выполнения js= ", time2, ddd);
+
         let output_array = new Int32Array(HEAP32.buffer, output_ptr, len);
         console.log("The starting array was:", input_array);
         console.log("The result read is:	", output_array);
@@ -35,9 +63,24 @@
         let parsedJson = JSON.parse(JSON.stringify(JSON_str));
         console.log("stringify JSON", JSON.stringify(parsedJson));
       }
+      function add(params) {
+        return params + 1;
+      }
+      function addBanch() {
+        let time = performance.now();
+        _add(4);
+        time = performance.now() - time;
+        console.log("Время выполнения add cpp = ", time);
+
+        let time2 = performance.now();
+        let ddd = add(4);
+        time2 = performance.now() - time2;
+        console.log("Время выполнения add js = ", time2, ddd);
+      }
     </script>
 
     <button onclick="pressBtn()">Click me!</button>
     <button onclick="JSONShow()">Show JSON!</button>
+    <button onclick="addBanch()">ADD!</button>
   </body>
 </html>

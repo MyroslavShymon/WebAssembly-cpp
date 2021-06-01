@@ -1,5 +1,2 @@
-/package-lock.json
-/*wasm
-/.vscode
-/.editorconfig
-/*js
+demo.wasm
+demo.js
